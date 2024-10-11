@@ -1,0 +1,26 @@
+{
+    "name": "express-js-docker-demo-app-ndixon",
+    "version": "1.0.0",
+    "description": "A node.js express demo app for exploratory docker projects",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "nodemon src/lib/server.js"
+    },
+    "keywords": [
+        "node",
+        "restful",
+        "api"
+      ],
+    "author": "Nathan Dixon",
+    "license": "GNU",
+    "dependencies": {
+      "body-parser": "^1.19.0",
+      "express": "^4.17.1",
+      "mongodb": "^3.3.3"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.4"
+      }
+  }
+  
