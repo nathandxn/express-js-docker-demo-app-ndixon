@@ -1,0 +1,38 @@
+# Deps
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Secrets
+*.local
+.env.local
+.env
+
+# Build
+dist
+storybook-static
+api-docs
+
+# VSCode settings
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Noise
+.DS_Store
+.dccache
+.idea
+
+# Testing
+test-results/
+playwright-output/
+playwright-report/
+reports/
+html
+coverage
+uploads
+
+# Ignore playwright screenshots captured on a Mac.
+*-darwin.png
