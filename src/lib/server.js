@@ -8,6 +8,8 @@ const limiter = new RateLimit({
   headers: true
 });
 
+const port = process.env.PORT || 3000;
+
 app.use(limiter);
 const fs = require('fs'); // file system
 const MongoClient = require('mongodb').MongoClient;
@@ -27,5 +29,9 @@ app.get('/profile-picture', (req, res) => {
   let img = fs.readFileSync(path.join(__dirname, "images/profile-1.jpg"));
   res.writeHead(200, {'Content-Type': 'image/jpg' });
   res.end(img, 'binary');
+});
+
+app.listen(port, function () {
+    console.log("app listening on port 3000!");
 });
   
