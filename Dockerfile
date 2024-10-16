@@ -4,4 +4,4 @@ RUN mkdir -p /home/app
 ## copy repo into image
 COPY . /home/app
 
-CMD ["npm", "start"]
+CMD ["node", "/home/app/src/lib/server.js"]
