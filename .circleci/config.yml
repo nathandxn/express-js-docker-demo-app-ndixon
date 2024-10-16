@@ -13,8 +13,9 @@ jobs:
           pkg-manager: npm
       - run:
           name: Run tests
-          command: echo \"No test specified in package.json\" && \
-                    echo \"Tests will be added later\"
+          command: |
+            echo \"No test specified in package.json\"
+            echo \"Tests will be added later\"
   deploy:
     # This is an example deploy job, not actually used by the workflow
     docker:
