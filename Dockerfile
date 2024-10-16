@@ -1,7 +1,10 @@
 FROM node:22.9-alpine3.19
 
-RUN mkdir -p /home/app
+RUN mkdir -p /srv/app
 ## copy repo into image
-COPY . /home/app
+COPY . /srv/app
 
-CMD ["node", "/home/app/src/lib/server.js"]
+RUN cd /srv/app && \
+    npm ci
+
+CMD ["node", "/srv/app/src/lib/server.js"]
