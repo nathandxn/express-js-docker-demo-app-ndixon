@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   node: circleci/node@5
 jobs:
-  test-node:
+  test:
     # Install node dependencies and run tests
     executor: node/default
     steps:
@@ -13,9 +13,8 @@ jobs:
           pkg-manager: npm
       - run:
           name: Run tests
-          command: |
-            echo \"No test specified in package.json\"
-            echo \"Tests will be added later\"
+          command: npm test
+
   deploy:
     # This is an example deploy job, not actually used by the workflow
     docker:
@@ -28,7 +27,7 @@ jobs:
 workflows:
   build-test-deploy:
     jobs:
-      - test-node
+      - test
     # - deploy:
     #     requires:
     #       - test-node
