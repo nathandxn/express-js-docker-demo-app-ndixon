@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path'); 
 const RateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const limiter = RateLimit({
   windowMs: parseInt(process.env.WINDOW_MS, 10),
   max: parseInt(process.env.MAX_IP_REQUESTS, 10),
@@ -15,6 +16,7 @@ const port = process.env.PORT || 3000;
 const fs = require('fs'); // file system
 const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
+const mongoSanitize = require('mongo-sanitize');
 const app = express();
 
 // use when starting application locally
@@ -30,12 +32,38 @@ let mongoClientOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 let databaseName = "user-account";
 
 
+app.use(helmet());
 app.use(limiter);
 
 app.use(bodyParser.urlencoded({
     extended: true
   }));
 app.use(bodyParser.json());
+
+// Sanitize input to prevent NoSQL injection by explicitly extracting and validating fields
+function sanitizeInput(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return {};
+  }
+  
+  const sanitized = {};
+  
+  // Explicitly extract and validate each allowed field
+  // Using String() constructor to ensure no MongoDB operators can be injected
+  if (typeof obj.name === 'string') {
+    sanitized.name = String(obj.name).substring(0, 100);
+  }
+  
+  if (typeof obj.email === 'string') {
+    sanitized.email = String(obj.email).substring(0, 100);
+  }
+  
+  if (typeof obj.interests === 'string') {
+    sanitized.interests = String(obj.interests).substring(0, 500);
+  }
+  
+  return sanitized;
+}
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
@@ -48,16 +76,26 @@ app.get('/profile-picture', (req, res) => {
 });
 
 app.post('/update-profile', (req, res) => {
-    let userObj = req.body;
+    // Sanitize input using mongo-sanitize to remove any keys starting with '$'
+    // and then apply field allowlist validation
+    const rawInput = mongoSanitize(req.body);
+    const sanitizedUserObj = sanitizeInput(rawInput);
   
     MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
       if (err) throw err;
   
       let db = client.db(databaseName);
-      userObj['userid'] = 1;
+      
+      // Create a clean update object with only allowed fields
+      const updateData = {
+        userid: 1,
+        name: sanitizedUserObj.name || '',
+        email: sanitizedUserObj.email || '',
+        interests: sanitizedUserObj.interests || ''
+      };
   
       let myquery = { userid: 1 };
-      let newvalues = { $set: userObj };
+      let newvalues = { $set: updateData };
   
       db.collection("users").updateOne(myquery, newvalues, {upsert: true}, function(err, res) {
         if (err) throw err;
@@ -65,8 +103,8 @@ app.post('/update-profile', (req, res) => {
       });
   
     });
-    // Send response
-    res.send(userObj);
+    // Send response as JSON with proper content-type to prevent XSS
+    res.json({ success: true, message: 'Profile updated successfully' });
   });
   
 
